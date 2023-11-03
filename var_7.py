@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 
 import requests
@@ -6,6 +7,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+
+def make_folder(name):
+    if not os.path.isdir(name):
+        os.mkdir(name)
 
 def get_hyperlinks(request): 
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))  
@@ -15,9 +20,7 @@ def get_hyperlinks(request):
     time.sleep(10)
     driver.find_element(By.CSS_SELECTOR, 'div.serp-item__preview a.serp-item__link').click()
 
-    path = f"urls_{request}.txt"
-    path_to_the_folder = "C:\\Users\\Alex\\Desktop\\" + path
-    with open(path_to_the_folder, 'w') as file:
+    with open(f"urls_{request}.txt", 'w') as file:
         for i in range(10):
             try:
                 time.sleep(0.5)
@@ -25,29 +28,32 @@ def get_hyperlinks(request):
                 file.write(link + '\n')
                 driver.find_element(By.CSS_SELECTOR, "div.CircleButton:nth-child(4)").click()
             except:
-                continue
-
+                continue   
     driver.close()
     driver.quit()
 
 def download_img(request):
     count = 0
-    os.makedirs(f"dataset/{request}")
+    make_folder("dataset")
+    make_folder(f"dataset/{request}")
 
     with open(f"urls_{request}.txt", "r") as file:
         for line in file:
             try:
                 url = line.strip()
                 time.sleep(4)
-                response = requests.get(url)
+                response = requests.get(url, stream=True)
                 if response.status_code == 200:
-                    with open(f"dataset/{request}/{count}.jpg", "wb") as image_file:
-                        image_file.write(response.content)
                     count+=1
+                    with open(f"dataset/{request}/{count}.jpg", "wb") as image_file:
+                        shutil.copyfileobj(response.raw, image_file)
                 else:
                     print(f'Ошибка при скачивании изображения с URL: {url}')
+                del response
             except:
                 continue
+    print(f'{count} успешно скачано')
+    print(os.path.abspath(f"dataset/{request}"))
 
 def main():
     request = "bay_horse"
