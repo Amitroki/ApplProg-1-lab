@@ -8,14 +8,20 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 
-def make_folder(name: str) -> None:
 
+def make_folder(name: str) -> None:
+    """
+    This method create a new folder if it isn't exist
+    """
     if not os.path.isdir(name):
         os.mkdir(name)
 
 
 def get_hyperlinks(request: str) -> None:
-
+    """
+    This method open a Yandex link, open the elements in the list of images
+    and copies their hyperlinks to a text file.
+    """
     driver = webdriver.Chrome(service=ChromeService(
         ChromeDriverManager().install()))
     url = f"https://yandex.ru/images/search?text={request}"
@@ -42,6 +48,10 @@ def get_hyperlinks(request: str) -> None:
 
 
 def download_img(request: str) -> None:
+    """
+    This method open each hypelinks in a text file and try to save opened images into a dataset.
+    After downloading images display the number of downloading instances.
+    """
     count = 0
     make_folder("dataset")
     make_folder(f"dataset/{request}")
