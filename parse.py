@@ -17,29 +17,25 @@ def make_folder(name: str) -> None:
         os.mkdir(name)
 
 
-def get_hyperlinks(request: str) -> None:
+def get_hyperlinks(request: str, quantity: int) -> None:
     """
     This method open a Yandex link, open the elements in the list of images
     and copies their hyperlinks to a text file.
     """
-    driver = webdriver.Chrome(service=ChromeService(
-        ChromeDriverManager().install()))
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
     url = f"https://yandex.ru/images/search?text={request}"
     driver.get(url=url)
     driver.maximize_window()
     time.sleep(10)
-    driver.find_element(
-        By.CSS_SELECTOR, 'div.serp-item__preview a.serp-item__link').click()
+    driver.find_element(By.CSS_SELECTOR, "a.Link.SimpleImage-Cover").click()
 
     with open(f"urls_{request}.txt", 'w') as file:
-        for i in range(1200):
+        for i in range(quantity):
             try:
                 time.sleep(0.5)
-                link = driver.find_element(
-                    By.CSS_SELECTOR, "a.Button2_view_action").get_attribute("href")
+                link = driver.find_element(By.CSS_SELECTOR, "a.Button2_view_action").get_attribute("href")
                 file.write(link + '\n')
-                driver.find_element(
-                    By.CSS_SELECTOR, "div.CircleButton:nth-child(4)").click()
+                driver.find_element(By.CSS_SELECTOR, "div.CircleButton:nth-child(4)").click()
             except:
                 continue
 
@@ -76,11 +72,14 @@ def download_img(request: str) -> None:
 def main() -> None:
     if os.path.isdir("dataset"):
         shutil.rmtree("dataset")
-
+    if os.path.isdir("__pycache__"):
+        shutil.rmtree("__pycache__")
+    
+    number_of_request = 1400
     request = "bay_horse"
-    get_hyperlinks(request)
+    get_hyperlinks(request, number_of_request)
     download_img(request)
 
     request = "zebra"
-    get_hyperlinks(request)
+    get_hyperlinks(request, number_of_request)
     download_img(request)
