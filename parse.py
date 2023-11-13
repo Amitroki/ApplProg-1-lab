@@ -50,7 +50,7 @@ def download_img(request: str) -> None:
     """
     count = 0
     make_folder("dataset")
-    make_folder(f"dataset/{request}")
+    make_folder(os.path.join("dataset", f"{request}"))
 
     with open(f"urls_{request}.txt", "r") as file:
         for line in file:
@@ -60,7 +60,7 @@ def download_img(request: str) -> None:
                 response = requests.get(url, stream=True)
                 if response.status_code == 200:
                     count += 1
-                    with open(f"dataset/{request}/{str(count).zfill(4)}.jpg", "wb") as image_file:
+                    with open(os.join.path("dataset", f"{request}", f"{str[count].zfill(4)}.jpg"), "wb") as image_file:
                         shutil.copyfileobj(response.raw, image_file)
                 else:
                     continue
@@ -75,7 +75,7 @@ def main() -> None:
     if os.path.isdir("__pycache__"):
         shutil.rmtree("__pycache__")
     
-    number_of_request = 1400
+    number_of_request = 5
     request = "bay_horse"
     get_hyperlinks(request, number_of_request)
     download_img(request)
